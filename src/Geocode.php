@@ -85,7 +85,7 @@ class Geocode
 
         $sUrl = self::URL.'?'.http_build_query([
             'address' => $sAddress,
-            'sensor' => 'false'
+            'sensor'  => 'false',
         ]);
 
         $ch = curl_init();
