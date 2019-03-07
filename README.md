@@ -3,6 +3,7 @@
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/d/total.svg" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/license.svg" alt="License"></a>
+<img src="https://github.styleci.io/repos/93961811/shield?style=flat" alt="StyleCI">
 
 ## Install
 
