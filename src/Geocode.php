@@ -4,18 +4,32 @@ namespace Davidvandertuijn;
 
 class Geocode
 {
+    /**
+     * @see https://developers.google.com/maps/documentation/geocoding/intro
+     */
     const URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-    protected $fLatitude;
-    protected $fLongitude;
-    protected $sAddress;
+    /**
+     * @var float
+     */
+    protected $fLatitude = 0.000000;
+
+    /**
+     * @var float
+     */
+    protected $fLongitude = 0.000000;
+
+    /**
+     * @var string
+     */
+    protected $sAddress = '';
 
     /**
      * Get Latitude.
      *
-     * @return string $this->fLatitude
+     * @return float $this->fLatitude
      */
-    public function getLatitude()
+    public function getLatitude(): float
     {
         return $this->fLatitude;
     }
@@ -23,9 +37,9 @@ class Geocode
     /**
      * Set Latitude.
      *
-     * @param string $fLatitude
+     * @param float $fLatitude
      */
-    public function setLatitude($fLatitude)
+    public function setLatitude(float $fLatitude)
     {
         $this->fLatitude = $fLatitude;
     }
@@ -33,9 +47,9 @@ class Geocode
     /**
      * Get Longitude.
      *
-     * @return string $this->fLongitude
+     * @return float $this->fLongitude
      */
-    public function getLongitude()
+    public function getLongitude(): float
     {
         return $this->fLongitude;
     }
@@ -43,9 +57,9 @@ class Geocode
     /**
      * Set Longitude.
      *
-     * @param string $fLongitude
+     * @param float $fLongitude
      */
-    public function setLongitude($fLongitude)
+    public function setLongitude(float $fLongitude): void
     {
         $this->fLongitude = $fLongitude;
     }
@@ -55,7 +69,7 @@ class Geocode
      *
      * @return string $this->sAddress
      */
-    public function getAddress()
+    public function getAddress(): string
     {
         return $this->sAddress;
     }
@@ -65,7 +79,7 @@ class Geocode
      *
      * @param string $sAddress
      */
-    public function setAddress($sAddress)
+    public function setAddress(string $sAddress)
     {
         $this->sAddress = $sAddress;
     }
@@ -75,7 +89,7 @@ class Geocode
      *
      * @return bool
      */
-    public function request()
+    public function request(): bool
     {
         $sAddress = $this->getAddress();
 
