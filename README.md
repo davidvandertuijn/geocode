@@ -3,14 +3,16 @@
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/d/total.svg" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/v/stable.svg" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/davidvandertuijn/geocode"><img src="https://poser.pugx.org/davidvandertuijn/geocode/license.svg" alt="License"></a>
-<img src="https://github.styleci.io/repos/93961811/shield?style=flat" alt="StyleCI">
+
+## Register an API Key
+
+Your application's API key. This key identifies your application for purposes of quota management. <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key">Learn how to get a key.</a>
 
 ## Install
 
 ```
 composer require davidvandertuijn/geocode
 ```
-
 ## Usage
 
 ```php
@@ -22,6 +24,7 @@ use Davidvandertuijn\Geocode;
 ```php
 $oGeocode = new Geocode();
 
+$oGeocode->setKey(''); // Your application's API key.
 $oGeocode->setAddress('Binnenhof 1A, 2511 CS, Den Haag, NL');
 
 if ($oGeocode->request()) {
