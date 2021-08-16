@@ -7,7 +7,7 @@ class Geocode
     /**
      * @see https://developers.google.com/maps/documentation/geocoding/intro
      */
-    const URL = 'https://maps.googleapis.com/maps/api/geocode/json';
+    const URL = 'https://maps.googleapis.com/maps/api/geocode';
 
     /**
      * @var float
@@ -24,6 +24,11 @@ class Geocode
      */
     protected $sAddress = '';
 
+    /**
+     * @var string
+     */
+    protected $sKey = '';
+    
     /**
      * Get Latitude.
      *
@@ -85,6 +90,26 @@ class Geocode
     }
 
     /**
+     * Get Key.
+     *
+     * @return string $this->sKey
+     */
+    public function getKey(): string
+    {
+        return $this->sKey;
+    }
+
+    /**
+     * Set Key.
+     *
+     * @param string $sKey
+     */
+    public function setKey(string $sKey)
+    {
+        $this->sKey = $sKey;
+    }
+    
+    /**
      * Request.
      *
      * @return bool
@@ -97,9 +122,16 @@ class Geocode
             return false;
         }
 
-        $sUrl = self::URL.'?'.http_build_query([
+        $sKey = $this->getKey();
+
+        if (!$sKey) {
+            return false;
+        }
+        
+        $sUrl = self::URL.'/json?'.http_build_query([
             'address' => $sAddress,
             'sensor'  => 'false',
+            'key' => $sKey
         ]);
 
         $ch = curl_init();
