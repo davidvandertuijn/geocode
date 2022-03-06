@@ -52,7 +52,7 @@ class Geocode
     /**
      * @var string
      */
-    public $response;
+    public $response = '';
 
     /**
      * Get Address.
@@ -289,6 +289,8 @@ class Geocode
 
     /**
      * cURL Error.
+     *
+     * @throws \Exception
      */
     public function curlError()
     {
