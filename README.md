@@ -22,13 +22,13 @@ use Davidvandertuijn\Geocode;
 **Request**
 
 ```php
-$oGeocode = new Geocode();
+$geocode = new Geocode();
 
-$oGeocode->setKey(''); // Your application's API key.
-$oGeocode->setAddress('Binnenhof 1A, 2511 CS, Den Haag, NL');
+$geocode->setApiKey(''); // Your application's API key.
+$geocode->setAddress('Westblaak 180, 3012 KN, Rotterdam, NL');
 
-if ($oGeocode->request()) {
-    $fLatitude = $oGeocode->getLatitude();
-    $fLongitude = $oGeocode->getLongitude();
+if ($geocode->request()) {
+    $latitude = $geocode->getLatitude(); // 51.9163212
+    $longitude = $geocode->getLongitude(); // 4.475754
 }
 ```

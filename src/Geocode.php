@@ -2,113 +2,313 @@
 
 namespace Davidvandertuijn;
 
+use Davidvandertuijn\Geocode\Exceptions\EmptyAddressException;
+use Davidvandertuijn\Geocode\Exceptions\EmptyApiKeyException;
+use Davidvandertuijn\Geocode\Exceptions\HttpCodeException;
+use Davidvandertuijn\Geocode\Exceptions\InvalidRequestException;
+use Davidvandertuijn\Geocode\Exceptions\OverDailyLimitException;
+use Davidvandertuijn\Geocode\Exceptions\OverQueryLimitException;
+use Davidvandertuijn\Geocode\Exceptions\RequestDeniedException;
+use Davidvandertuijn\Geocode\Exceptions\UnkownErrorException;
+use Davidvandertuijn\Geocode\Exceptions\ZeroResultsException;
+use Exception;
+
+/**
+ * Geocode.
+ * @see https://developers.google.com/maps/documentation/geocoding/intro
+ */
 class Geocode
 {
     /**
-     * @see https://developers.google.com/maps/documentation/geocoding/intro
+     * @const string
      */
     const URL = 'https://maps.googleapis.com/maps/api/geocode';
 
     /**
-     * @var float
+     * @var string
      */
-    protected $fLatitude = 0.000000;
+    public $address = '';
+
+    /**
+     * @var mixed
+     */
+    public $ch;
 
     /**
      * @var float
      */
-    protected $fLongitude = 0.000000;
+    public $latitude = 0.000000;
+
+    /**
+     * @var float
+     */
+    public $longitude = 0.000000;
 
     /**
      * @var string
      */
-    protected $sAddress = '';
+    public $apiKey = '';
 
     /**
      * @var string
      */
-    protected $sKey = '';
-    
-    /**
-     * Get Latitude.
-     *
-     * @return float $this->fLatitude
-     */
-    public function getLatitude(): float
-    {
-        return $this->fLatitude;
-    }
-
-    /**
-     * Set Latitude.
-     *
-     * @param float $fLatitude
-     */
-    public function setLatitude(float $fLatitude)
-    {
-        $this->fLatitude = $fLatitude;
-    }
-
-    /**
-     * Get Longitude.
-     *
-     * @return float $this->fLongitude
-     */
-    public function getLongitude(): float
-    {
-        return $this->fLongitude;
-    }
-
-    /**
-     * Set Longitude.
-     *
-     * @param float $fLongitude
-     */
-    public function setLongitude(float $fLongitude): void
-    {
-        $this->fLongitude = $fLongitude;
-    }
+    public $response;
 
     /**
      * Get Address.
      *
-     * @return string $this->sAddress
+     * @return string
      */
     public function getAddress(): string
     {
-        return $this->sAddress;
+        return $this->address;
     }
 
     /**
      * Set Address.
      *
-     * @param string $sAddress
+     * @param string $address
      */
-    public function setAddress(string $sAddress)
+    public function setAddress(string $address)
     {
-        $this->sAddress = $sAddress;
+        $this->address = $address;
     }
 
     /**
-     * Get Key.
+     * Get Api Key.
      *
-     * @return string $this->sKey
+     * @return string
      */
-    public function getKey(): string
+    public function getApiKey(): string
     {
-        return $this->sKey;
+        return $this->apiKey;
     }
 
     /**
-     * Set Key.
+     * Set Api Key.
      *
-     * @param string $sKey
+     * @param string $apiKey
      */
-    public function setKey(string $sKey)
+    public function setApiKey(string $apiKey)
     {
-        $this->sKey = $sKey;
+        $this->apiKey = $apiKey;
     }
-    
+
+    /**
+     * Get Curl Handle.
+     *
+     * @return mixed
+     */
+    public function getCh()
+    {
+        return $this->ch;
+    }
+
+    /**
+     * Set Curl Handle.
+     *
+     * @param mixed $ch
+     */
+    public function setCh($ch)
+    {
+        $this->ch = $ch;
+    }
+
+    /**
+     * Get Latitude.
+     *
+     * @return float
+     */
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * Set Latitude.
+     *
+     * @param float $latitude
+     */
+    public function setLatitude(float $latitude)
+    {
+        $this->latitude = $latitude;
+    }
+
+    /**
+     * Get Longitude.
+     *
+     * @return float
+     */
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * Set Longitude.
+     *
+     * @param float $longitude
+     */
+    public function setLongitude(float $longitude)
+    {
+        $this->longitude = $longitude;
+    }
+
+    /**
+     * Get Response.
+     *
+     * @return string
+     */
+    public function getResponse(): string
+    {
+        return $this->response;
+    }
+
+    /**
+     * Set Response.
+     *
+     * @param string $response
+     */
+    public function setResponse(string $response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * After.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\HttpCodeException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\InvalidRequestException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\OverDailyLimitException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\OverQueryLimitException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\RequestDeniedException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\UnkownErrorException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\ZeroResultsException
+     */
+    public function after()
+    {
+        // Check Failure.
+
+        if ($this->getResponse() === false) {
+            $this->curlError();
+        }
+
+        // Check HTTP Code.
+        $this->checkHttpCode();
+
+        // Check Status.
+        $this->checkStatus();
+
+        // Results.
+        $this->results();
+    }
+
+    /**
+     * Before.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\EmptyAddressException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\EmptyApiKeyException
+     */
+    public function before()
+    {
+        // Check Address.
+        $this->checkAddress();
+
+        // Check API Key.
+        $this->checkApiKey();
+    }
+
+    /**
+     * Check Address.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\EmptyAddressException
+     */
+    public function checkAddress()
+    {
+        if (empty($this->getAddress())) {
+            throw new EmptyAddressException();
+        }
+    }
+
+    /**
+     * Check Api Key.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\EmptyApiKeyException
+     */
+    public function checkApiKey()
+    {
+        if (empty($this->getApiKey())) {
+            throw new EmptyApiKeyException();
+        }
+    }
+
+    /**
+     * Check Http Code.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\HttpCodeException
+     */
+    public function checkHttpCode()
+    {
+        if (curl_getinfo($this->getCh(), CURLINFO_HTTP_CODE) != 200) {
+            throw new HttpCodeException($httpCode);
+        }
+    }
+
+    /**
+     * Check Status.
+     */
+    public function checkStatus()
+    {
+        // Decodes a JSON string.
+        $response = json_decode($this->getResponse());
+
+        switch ($response->status) {
+            case "ZERO_RESULTS":
+                throw new ZeroResultsException($response->error_message);
+            case "OVER_DAILY_LIMIT":
+                throw new OverDailyLimitException($response->error_message);
+            case "OVER_QUERY_LIMIT":
+                throw new OverQueryLimitException($response->error_message);
+            case "REQUEST_DENIED":
+                throw new RequestDeniedException($response->error_message);
+            case "INVALID_REQUEST":
+                throw new InvalidRequestException($response->error_message);
+            case "UNKNOWN_ERROR":
+                throw new UnkownErrorException($response->error_message);
+        }
+    }
+
+    /**
+     * cURL Error.
+     */
+    public function curlError()
+    {
+        throw new Exception(curl_error($this->getCh()));
+    }
+
+    /**
+     * cURL Setopt.
+     */
+    public function curlSetopt()
+    {
+        curl_setopt($this->getCh(), CURLOPT_URL, $this->curloptUrl());
+        curl_setopt($this->getCh(), CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->getCh(), CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($this->getCh(), CURLOPT_SSL_VERIFYPEER, false);
+    }
+
+    /**
+     * Curlopt URL.
+     */
+    public function curloptUrl()
+    {
+        return self::URL.'/json?'.http_build_query([
+                'address' => $this->getAddress(),
+                'sensor' => 'false',
+                'key' => $this->getApiKey()
+            ]);
+    }
+
     /**
      * Request.
      *
@@ -116,55 +316,40 @@ class Geocode
      */
     public function request(): bool
     {
-        $sAddress = $this->getAddress();
+        // Before
+        $this->before();
 
-        if (!$sAddress) {
-            return false;
-        }
+        // Initialize a cURL session.
+        $this->setCh(curl_init());
 
-        $sKey = $this->getKey();
+        // Sets multiple options for a cURL session.
+        $this->curlSetopt();
 
-        if (!$sKey) {
-            return false;
-        }
-        
-        $sUrl = self::URL.'/json?'.http_build_query([
-            'address' => $sAddress,
-            'sensor'  => 'false',
-            'key' => $sKey
-        ]);
+        // Perform a cURL session.
+        $this->setResponse(curl_exec($this->getCh()));
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $sUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-        $sResponse = curl_exec($ch);
-
-        if ($sResponse === false) {
-            return false;
-        }
-
-        $iHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if ($iHttpCode != 200) {
-            return false;
-        }
-
-        $oResponse = json_decode($sResponse);
-
-        if ($oResponse->status != 'OK') {
-            return false;
-        }
-
-        $fLatitude = (float) $oResponse->results[0]->geometry->location->lat;
-        $fLongitude = (float) $oResponse->results[0]->geometry->location->lng;
-
-        $this->setLatitude($fLatitude);
-        $this->setLongitude($fLongitude);
+        // After
+        $this->after();
 
         return true;
+    }
+
+    /**
+     * Results.
+     */
+    public function results()
+    {
+        // Decodes a JSON string.
+        $response = json_decode($this->getResponse());
+
+        // Latitude.
+
+        $latitude = (float) $response->results[0]->geometry->location->lat;
+        $this->setLatitude($latitude);
+
+        // Longitude.
+
+        $longitude = (float) $response->results[0]->geometry->location->lng;
+        $this->setLongitude($longitude);
     }
 }
