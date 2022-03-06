@@ -258,6 +258,13 @@ class Geocode
 
     /**
      * Check Status.
+     *
+     * @throws \Davidvandertuijn\Geocode\Exceptions\InvalidRequestException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\OverDailyLimitException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\OverQueryLimitException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\RequestDeniedException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\UnkownErrorException
+     * @throws \Davidvandertuijn\Geocode\Exceptions\ZeroResultsException
      */
     public function checkStatus()
     {
