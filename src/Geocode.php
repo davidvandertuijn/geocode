@@ -249,7 +249,9 @@ class Geocode
      */
     public function checkHttpCode()
     {
-        if (curl_getinfo($this->getCh(), CURLINFO_HTTP_CODE) != 200) {
+        $httpCode = curl_getinfo($this->getCh(), CURLINFO_HTTP_CODE);
+
+        if ($httpCode != 200) {
             throw new HttpCodeException($httpCode);
         }
     }
